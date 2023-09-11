@@ -12,23 +12,24 @@ import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 
 export class AppComponent {
   title = 'TestWebSockets';
-  webSocket$: WebSocketSubject<any> | undefined = <WebSocketSubject<any>>{};
+  webSocket$: WebSocketSubject<any> | undefined;
   subscription: Subscription = <Subscription>{};
   public log: string = "";
   private currentPath: string = "";
 
   public createWebSocketSubject(path: string) {
     this.log = this.log + `\n[${path}] Connecting to WebSocket\n`;
-    if (!this.webSocket$ || !this.webSocket$.closed)
-    if (this.currentPath !== path && this.currentPath !== "") {
+    if (this.webSocket$ !== undefined && !this.webSocket$.closed){
+    // if (this.currentPath !== path && this.currentPath !== "") {
+      this.log = this.log + `[${path}] connected already. Unsubscribing\n`;
       this.unsubscribeSocketSubscription();
     }
     this.currentPath = path;
     this.log = this.log + `[${this.currentPath}] Creating websocket subject\n`;
     this.webSocket$ = webSocket<any>({
       // url: 'ws://localhost:58000/' + path,
-      // url: 'ws://192.168.0.135:58000/' + path,
-      url: 'ws://10.0.30.164:58000/' + path,
+      url: 'ws://192.168.0.135:58000/' + path,
+      // url: 'ws://10.0.30.164:58000/' + path,
       openObserver: {
         next: (e:Event) => {
            this.log = this.log + `[openObserver.next][${this.currentPath}] Type: ${e.type}. Target: ${e.target}\n`;
@@ -85,9 +86,15 @@ export class AppComponent {
 
 
   public unsubscribeSocketSubscription() {
-    this.log = this.log + `[this.webSocket.complete()][${this.currentPath}] Unsubscribing from socket subscription\n`
-    this.webSocket$?.complete;
-    this.webSocket$ = undefined;
+    // this.log = this.log + `[this.subscription.unsubscribe()][${this.currentPath}] Unsubscribing from socket subscription\n`
+    // this.subscription.unsubscribe();
+    this.log = this.log + `[this.webSocket.complete()][${this.currentPath}] Closing from websocket\n`
+    if (this.webSocket$ === undefined){
+      this.log = this.log + `[this.webSocket.complete()][${this.currentPath}] WebSocket is undefined\n`
+      return;
+    }
+    this.webSocket$.complete;
+    // this.webSocket$ = undefined;
     this.currentPath = "";
   }
 
