@@ -15,14 +15,26 @@ export class AppComponent {
   subject: WebSocketSubject<any> = <WebSocketSubject<any>>{};
   subscription: Subscription = <Subscription>{};
   public log: string = "";
+  private currentPath: string = "";
 
   public createWebeSocketSubject(path: string) {
+    this.log = this.log + `\nConnecting to WebSocket with Path: ${path}\n`;
+    if (this.currentPath !== path && this.currentPath !== "") {
+      this.log = this.log + `Subscription to ${this.currentPath} open. Unsubscribing first.\n`
+      this.subscription.unsubscribe();
+    }
+    this.currentPath = path;
     this.log = this.log + `Creating websocket subject with path: ${path}\n`;
     this.subject = webSocket<any>({
       // url: 'ws://localhost:58000/' + path,
       url: 'ws://192.168.0.135:58000/' + path,
       openObserver: {
-        next: (e:Event) => this.log = this.log + `[openObserver] Next. Type: ${e.type}. Target: ${e.target}.\n`,
+        next: (e:Event) => {
+           this.log = this.log + `[openObserver] Next. Type: ${e.type}. Target: ${e.target}.\n`;
+           this.log = this.log + `[openObserver] Requesting Full State from Server.\n`;
+           this.sendMessage('Full');
+           return;
+        },
         error: (e: Event) => this.log = this.log + `[openObserver] Error. ${JSON.stringify(e)}\n`,
         complete: () => this.log = this.log + `[openObserver] Complete\n`,
       },
@@ -37,6 +49,7 @@ export class AppComponent {
         complete: () => this.log = this.log + `[closingObserver] Complete\n`,
       },
     });
+    this.subscribeWebSocketSubject();
   }
 
   public subscribeWebSocketSubject() {
@@ -48,10 +61,19 @@ export class AppComponent {
       }, resetOnSuccess: true })
     ).subscribe({
       next: msg => this.log = this.log + `[subcription] Next: [${msg}]\n`, // Called whenever there is a message from the server.
-      error: err => this.log = this.log + `[subcription] Error ${JSON.stringify(err)}\n`, // Called if at any point WebSocket API signals some kind of error.
-      complete: () => this.log = this.log + '[subcription] complete\n' // Called when connection is closed (for whatever reason).
+      error: err => {
+         this.log = this.log + `[subcription] Error ${JSON.stringify(err)}\n`;
+         this.log = this.log + `[subcription] Resubscribing to ${this.currentPath}\n`; // Called when connection is closed (for whatever reason).
+         this.createWebeSocketSubject(this.currentPath);
+         return;
+      }, // Called if at any point WebSocket API signals some kind of error.
+      complete: () => {
+        this.log = this.log + '[subcription] complete\n'; // Called when connection is closed (for whatever reason).
+        this.log = this.log + `[subcription] Resubscribing to ${this.currentPath}\n`; // Called when connection is closed (for whatever reason).
+        this.createWebeSocketSubject(this.currentPath);
+        return;
+      } // Called when connection is closed (for whatever reason).
     });
-    timer
   }
 
   public sendMessage(message: string) {
@@ -63,22 +85,9 @@ export class AppComponent {
   public unsubcribeSocketSubscription() {
     this.log = this.log + `[this.subscription.unsubscribe()] Unsubscribing from socket subscription\n`
     this.subscription.unsubscribe();
+    this.currentPath = "";
   }
 
-  public unsubcribeSocketSubject() {
-    this.log = this.log + `[this.subject.unsubscribe()] Unsubscribing from socket subject\n`
-    this.subject.unsubscribe();
-  }
-
-  public completeConnection() {
-    this.log = this.log + `[this.subject.complete()] Completing Connection\n`
-    this.subject.complete(); // Closes the connection.
-  }
-
-  public completeWithError() {
-    this.log = this.log + `[this.subject.error(...)] Completing Connection with Error\n`
-    this.subject.error({ code: 4500, reason: 'Client Completing With Error!' }); // Informs the server that this client is disconnecting.
-  }
 
   public clearLog(){
     this.log = "";

@@ -52,22 +52,18 @@
 
   <div class="card-container">
     <a class="card" target="_blank" (click)="createWebeSocketSubject('home')">
-      <span>Create Websocket Subject for Home</span>
+      <span>Start Websocket Subject for Home</span>
     </a>
 
     <a class="card" target="_blank" (click)="createWebeSocketSubject('office')">
-      <span>Create Websocket Subject for Office</span>
+      <span>Start Websocket Subject for Office</span>
     </a>
 
     <a class="card" target="_blank" (click)="createWebeSocketSubject('kitchen')">
-      <span>Create Websocket Subject for Kitchen</span>
+      <span>Start Websocket Subject for Kitchen</span>
     </a>
 
-    <a class="card" target="_blank" (click)="subscribeWebSocketSubject()">
-      <span>Subscribe to Websocket</span>
-    </a>
-
-    <a class="card" target="_blank" (click)="sendMessage('Full')">
+     <a class="card" target="_blank" (click)="sendMessage('Full')">
       <span>Send get Full State Message</span>
     </a>
 
@@ -80,19 +76,7 @@
     </a>
 
     <a class="card" target="_blank" (click)="unsubcribeSocketSubscription()">
-      <span>Unsubscibe Subscription</span>
-    </a>
-
-    <a class="card" target="_blank" (click)="unsubcribeSocketSubject()">
-      <span>Unsubscibe Subject</span>
-    </a>
-
-    <a class="card" target="_blank" (click)="completeConnection()">
-      <span>Complete Subject</span>
-    </a>
-
-    <a class="card" target="_blank" (click)="completeWithError()">
-      <span>Complete Subject with error</span>
+      <span>Terminate Current Subscription</span>
     </a>
 
     <a class="card" target="_blank" (click)="clearLog()">
