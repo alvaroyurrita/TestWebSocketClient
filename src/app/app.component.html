@@ -51,15 +51,15 @@
   <p>Press to initiate different tests:</p>
 
   <div class="card-container">
-    <a class="card" target="_blank" (click)="createWebeSocketSubject('home')">
+    <a class="card" target="_blank" (click)="createWebSocketSubject('home')">
       <span>Start Websocket Subject for Home</span>
     </a>
 
-    <a class="card" target="_blank" (click)="createWebeSocketSubject('office')">
+    <a class="card" target="_blank" (click)="createWebSocketSubject('office')">
       <span>Start Websocket Subject for Office</span>
     </a>
 
-    <a class="card" target="_blank" (click)="createWebeSocketSubject('kitchen')">
+    <a class="card" target="_blank" (click)="createWebSocketSubject('kitchen')">
       <span>Start Websocket Subject for Kitchen</span>
     </a>
 
@@ -72,10 +72,10 @@
     </a>
 
     <a class="card" target="_blank" (click)="sendMessage('Something')">
-      <span>Send a Message that server wont understand</span>
+      <span>Send a Message that server won't understand</span>
     </a>
 
-    <a class="card" target="_blank" (click)="unsubcribeSocketSubscription()">
+    <a class="card" target="_blank" (click)="unsubscribeSocketSubscription()">
       <span>Terminate Current Subscription</span>
     </a>
 
