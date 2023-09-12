@@ -18,6 +18,7 @@ export class AppComponent {
   private currentPath: string = "";
 
   public createWebSocketSubject(path: string) {
+    // if (path === this.currentPath) return;
     this.log = this.log + `\n[${path}] Connecting to WebSocket\n`;
     if (this.webSocket$ !== undefined && !this.webSocket$.closed){
     // if (this.currentPath !== path && this.currentPath !== "") {
@@ -32,17 +33,17 @@ export class AppComponent {
       // url: 'ws://10.0.30.164:58000/' + path,
       openObserver: {
         next: (e:Event) => {
-           this.log = this.log + `[openObserver.next][${this.currentPath}] Type: ${e.type}. Target: ${e.target}\n`;
-           this.log = this.log + `[openObserver.next][${this.currentPath}] Requesting Full State from Server\n`;
+           this.log = this.log + `[openObserver.next][${(e.target as WebSocket).url.split('/')[3]}] Type: ${e.type}. Target: ${e.target}\n`;
+           this.log = this.log + `[openObserver.next][${(e.target as WebSocket).url.split('/')[3]}] Requesting Full State from Server\n`;
            this.sendMessage('Full');
            return;
         },
-        error: (e: Event) => this.log = this.log + `[openObserver.error][${this.currentPath}]${JSON.stringify(e)}\n`,
+        error: (e: Event) => this.log = this.log + `[openObserver.error][${(e.target as WebSocket).url}]${JSON.stringify(e)}\n`,
         complete: () => this.log = this.log + `[openObserver.error][${this.currentPath}] Complete\n`,
       },
       closeObserver: {
-        next: (e: CloseEvent) => this.log = this.log + `[closeObserver.next][${this.currentPath}] Code: ${e.code}. Type ${e.type}. Reason: [${e.reason}] WasClean: ${e.wasClean}\n`,
-        error: (e) => this.log = this.log + `[closeObserver.error][${this.currentPath}] ${JSON.stringify(e)}\n`,
+        next: (e: CloseEvent) => this.log = this.log + `[closeObserver.next][${(e.target as WebSocket).url.split('/')[3]}] Code: ${e.code}. Type ${e.type}. Reason: [${e.reason}] WasClean: ${e.wasClean}\n`,
+        error: (e) => this.log = this.log + `[closeObserver.error][${(e.target as WebSocket).url}] ${JSON.stringify(e)}\n`,
         complete: () => this.log = this.log + `[closeObserver.complete][${this.currentPath}]\n`,
       },
       closingObserver: {
@@ -71,7 +72,7 @@ export class AppComponent {
          return;
       }, // Called if at any point WebSocket API signals some kind of error.
       complete: () => {
-        this.log = this.log + '[subscription.complete][${this.currentPath}]\n'; // Called when connection is closed (for whatever reason).
+        this.log = this.log + `[subscription.complete][${this.currentPath}]\n`; // Called when connection is closed (for whatever reason).
         this.log = this.log + `[subscription.complete][${this.currentPath}] Resubscribing to ${this.currentPath}\n`; // Called when connection is closed (for whatever reason).
         this.createWebSocketSubject(this.currentPath);
         return;
@@ -86,16 +87,15 @@ export class AppComponent {
 
 
   public unsubscribeSocketSubscription() {
-    // this.log = this.log + `[this.subscription.unsubscribe()][${this.currentPath}] Unsubscribing from socket subscription\n`
-    // this.subscription.unsubscribe();
+    this.log = this.log + `[this.subscription.unsubscribe()][${this.currentPath}] Unsubscribing from socket subscription\n`
+    this.subscription.unsubscribe();
     this.log = this.log + `[this.webSocket.complete()][${this.currentPath}] Closing from websocket\n`
     if (this.webSocket$ === undefined){
       this.log = this.log + `[this.webSocket.complete()][${this.currentPath}] WebSocket is undefined\n`
       return;
     }
-    this.webSocket$.complete;
-    // this.webSocket$ = undefined;
-    this.currentPath = "";
+    this.webSocket$.complete();
+    this.webSocket$ = undefined;
   }
 
 
